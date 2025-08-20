@@ -19,7 +19,7 @@ from .exceptions import (
     ShortlyJsonDecodeError
 )
 
-def convert(self, link, alias=None, timeout=10):
+def convert(self, link, alias=None, silently=false, timeout=10):
     """
     Shorten a URL using Link Shortly/All Adlinkfy API.
 
