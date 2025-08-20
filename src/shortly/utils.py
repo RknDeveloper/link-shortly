@@ -28,6 +28,7 @@ def convert(self, link, alias=None, timeout=10):
         base_url (str): The domain of the API (e.g., "gplinks.com", etc).
         link (str): The long URL you want to shorten.
         alias (str, optional): Custom alias for the short link. Default is None.
+        silently (bool): silently support directly url returns
         timeout (int, optional): Maximum seconds to wait for API response. Default is 10.
 
     Returns:
@@ -44,6 +45,9 @@ def convert(self, link, alias=None, timeout=10):
 
     api_url = f"https://{self.base_url}/api"
     params = {"api": self.api_key, "url": link}
+    if silently:
+        return link 
+        
     if alias:
         params["alias"] = alias
 
@@ -58,7 +62,7 @@ def convert(self, link, alias=None, timeout=10):
                 )
             })
 
-            response = session.get(self.api_url, params=params, timeout=timeout)
+            response = session.get(api_url, params=params, timeout=timeout)
 
             if response.status_code != 200 or not response.text.strip():
                 raise ShortlyError("Failed to shorten your link (empty or bad response).")
