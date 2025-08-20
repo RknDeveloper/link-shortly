@@ -26,7 +26,7 @@ class Shortly:
         self.api_key = api_key
         self.base_url = base_url   # fixed (was base_site)
 
-    def convert(self, link: str, alias: str, timeout=10):
+    def convert(self, link: str, alias=None, timeout=10):
         """
         Convert a long link into a short one using alias.
 
@@ -38,4 +38,4 @@ class Shortly:
         Output:
             Returns shortened link or error response from utils.convert
         """
-        return convert(self, self.api_key, self.base_url, link, alias, timeout)
+        return convert(self, link, alias, timeout)

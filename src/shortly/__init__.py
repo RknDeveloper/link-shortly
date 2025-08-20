@@ -9,7 +9,7 @@ Copyright (c) 2025-present RknDeveloper
 """
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __author__ = "RknDeveloper"
 __license__ = "MIT License "
 __copyright__ = "Copyright (C) 2025-present RknDeveloper <https://github.com/RknDeveloper>"

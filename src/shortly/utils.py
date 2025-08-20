@@ -19,7 +19,7 @@ from .exceptions import (
     ShortlyJsonDecodeError
 )
 
-def convert(self, api_key, base_url, link, alias=None, timeout=10):
+def convert(self, link, alias=None, timeout=10):
     """
     Shorten a URL using Link Shortly/All Adlinkfy API.
 
@@ -42,8 +42,8 @@ def convert(self, api_key, base_url, link, alias=None, timeout=10):
         ShortlyError: For other API-related errors.
     """
 
-    api_url = f"https://api.{base_url}/api"
-    params = {"api": api_key, "url": link}
+    api_url = f"https://{self.base_url}/api"
+    params = {"api": self.api_key, "url": link}
     if alias:
         params["alias"] = alias
 
@@ -58,7 +58,7 @@ def convert(self, api_key, base_url, link, alias=None, timeout=10):
                 )
             })
 
-            response = session.get(api_url, params=params, timeout=timeout)
+            response = session.get(self.api_url, params=params, timeout=timeout)
 
             if response.status_code != 200 or not response.text.strip():
                 raise ShortlyError("Failed to shorten your link (empty or bad response).")
@@ -84,6 +84,6 @@ def convert(self, api_key, base_url, link, alias=None, timeout=10):
     except requests.exceptions.Timeout:
         raise ShortlyTimeoutError(f"Request timed out after {timeout} seconds.")
     except requests.exceptions.ConnectionError:
-        raise ShortlyConnectionError(f"Failed to connect to {api_url}.")
+        raise ShortlyConnectionError(f"Failed to connect to {self.base_url}.")
     except requests.exceptions.RequestException as e:
         raise ShortlyError(f"An unexpected error occurred: {e}")
