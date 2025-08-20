@@ -19,7 +19,7 @@ from .exceptions import (
     ShortlyJsonDecodeError
 )
 
-def convert(self, link, alias=None, silently=false, timeout=10):
+def convert(self, link, alias=None, silently=False, timeout=10):
     """
     Shorten a URL using Link Shortly/All Adlinkfy API.
 
@@ -28,7 +28,7 @@ def convert(self, link, alias=None, silently=false, timeout=10):
         base_url (str): The domain of the API (e.g., "gplinks.com", etc).
         link (str): The long URL you want to shorten.
         alias (str, optional): Custom alias for the short link. Default is None.
-        silently (bool): silently support directly url returns
+        silently (bool): If True, the function will directly return the original URL without raising errors.
         timeout (int, optional): Maximum seconds to wait for API response. Default is 10.
 
     Returns:
