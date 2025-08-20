@@ -18,9 +18,14 @@ pip install --upgrade link-shortly
 ```python
 from shortly import Shortly
 
-shortly = Shortly(api_key="your_api_key", base_url="gplinks.com")
-link = shortly.convert("https://example.com/long-url")
-print(f"Shortened Link: {link}")
+shortly = Shortly(api_key='<YOUR API KEY>', base_url='<YOUR BASE SITE>')
+
+def main():
+    link = shortly.convert("https://example.com/long-url")
+    print(link)
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## Error Handling
