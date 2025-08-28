@@ -1,5 +1,5 @@
 """
-link-shortly - A simple URL shortening library.
+Link-Shortly - A simple URL shortening library.
 
 @author:   RknDeveloper
 @contact:  https://t.me/RknDeveloperr
@@ -8,8 +8,8 @@ link-shortly - A simple URL shortening library.
 Copyright (c) 2025-present RknDeveloper
 """
 
-import requests
-import json
+import aiohttp
+import asyncio
 from .exceptions import (
     ShortlyError,
     ShortlyInvalidLinkError,
@@ -19,7 +19,8 @@ from .exceptions import (
     ShortlyJsonDecodeError
 )
 
-def convert(self, link, alias=None, silently=False, timeout=10):
+
+async def convert(self, link, alias=None, silently=False, timeout=10):
     """
     Shorten a URL using Link Shortly/All Adlinkfy API.
 
@@ -42,52 +43,47 @@ def convert(self, link, alias=None, silently=False, timeout=10):
         ShortlyJsonDecodeError: If API response is not valid JSON.
         ShortlyError: For other API-related errors.
     """
-
     api_url = f"https://{self.base_url}/api"
     params = {"api": self.api_key, "url": link}
+
     if silently:
-        return link 
-        
+        return link
     if alias:
         params["alias"] = alias
 
     try:
-        # request session started
-        with requests.Session() as session:
-            session.headers.update({
+        async with aiohttp.ClientSession() as session:
+            headers = {
                 "User-Agent": (
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                     "AppleWebKit/537.36 (KHTML, like Gecko) "
                     "Chrome/91.0.4472.124 Safari/537.36"
                 )
-            })
+            }
+            async with session.get(api_url, params=params, headers=headers, timeout=timeout) as response:
+                if response.status != 200:
+                    raise ShortlyError("Failed to shorten your link (bad response).")
+                try:
+                    data = await response.json()
+                except Exception as e:
+                    raise ShortlyJsonDecodeError(f"Invalid JSON response: {e}")
 
-            response = session.get(api_url, params=params, timeout=timeout)
+                status = data.get("status", "").lower()
+                message = data.get("message", "Unknown error")
 
-            if response.status_code != 200 or not response.text.strip():
-                raise ShortlyError("Failed to shorten your link (empty or bad response).")
+                if status != "success":
+                    if "invalid" in message.lower():
+                        raise ShortlyInvalidLinkError(message)
+                    elif "not found" in message.lower() or "expired" in message.lower():
+                        raise ShortlyLinkNotFoundError(message)
+                    else:
+                        raise ShortlyError(message)
 
-            try:
-                data = response.json()
-            except json.JSONDecodeError as e:
-                raise ShortlyJsonDecodeError(f"Invalid JSON response: {e}")
+                return data.get("shortenedUrl")
 
-            status = data.get("status", "").lower()
-            message = data.get("message", "Unknown error")
-
-            if status != "success":
-                if "invalid" in message.lower():
-                    raise ShortlyInvalidLinkError(message)
-                elif "not found" in message.lower() or "expired" in message.lower():
-                    raise ShortlyLinkNotFoundError(message)
-                else:
-                    raise ShortlyError(message)
-
-            return data.get("shortenedUrl")
-
-    except requests.exceptions.Timeout:
+    except asyncio.TimeoutError:
         raise ShortlyTimeoutError(f"Request timed out after {timeout} seconds.")
-    except requests.exceptions.ConnectionError:
+    except aiohttp.ClientConnectionError:
         raise ShortlyConnectionError(f"Failed to connect to {self.base_url}.")
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         raise ShortlyError(f"An unexpected error occurred: {e}")

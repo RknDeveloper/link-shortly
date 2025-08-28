@@ -9,7 +9,9 @@ setup(
     version=version,
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=["requests"],
+    install_requires=[
+    "aiohttp>=3.12.15",
+],
     author="rkndeveloper",
     author_email="vardhacopyrightteam@gmail.com",
     description="Link-Shortly is a simple Python library to shorten links using the Link-Shortly API or compatible services (like Adlinkfy, GPLinks, etc).",

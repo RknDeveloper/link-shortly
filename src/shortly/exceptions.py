@@ -21,3 +21,7 @@ class ShortlyConnectionError(ShortlyError):
 class ShortlyJsonDecodeError(ShortlyError):
     """Raised when the API response is not valid JSON."""
     pass
+
+class ShortlyValueError(ShortlyError):
+    """Raised when invalid input is provided to the Shortly client (e.g., api_key or base_url)."""
+    pass

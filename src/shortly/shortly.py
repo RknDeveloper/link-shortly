@@ -8,11 +8,16 @@ Link-Shortly - A simple URL shortening library.
 Copyright (c) 2025-present RknDeveloper
 """
 
-from .utils import convert
-import requests
+import asyncio
+import functools
+from .utils import convert as _utils_convert
+from .exceptions import (
+    ShortlyValueError
+)
+from urllib.parse import urlparse
 
 class Shortly:
-    def __init__(self, api_key: str, base_url: str):
+    def __init__(self, api_key=None, base_url=None):
         """
         Initialize Shortly instance.
         
@@ -22,11 +27,21 @@ class Shortly:
         
         Output:
             Stores api_key and base_url in the object
+            
+        Raises:
+            ShortlyValueError: api_key & base_url must be a non-empty string
+        
         """
+        if not base_url or not isinstance(base_url, str):
+            raise ShortlyValueError("base_url must be a non-empty string")
+        if not api_key or not isinstance(api_key, str):
+            raise ShortlyValueError("api_key must be a non-empty string")
+            
         self.api_key = api_key
-        self.base_url = base_url   # fixed (was base_site)
+        self.base_url = (urlparse(base_url).netloc or urlparse(base_url).path).rstrip("/")
 
-    def convert(self, link: str, alias=None, silently=False, timeout=10):
+    # Internal async method calling utils.convert
+    async def _convert_async(self, link, alias=None, silently=False, timeout=10):
         """
         Convert a long link into a short one using alias.
 
@@ -39,4 +54,31 @@ class Shortly:
         Output:
             Returns shortened link or error response from utils.convert
         """
-        return convert(self, link, alias, silently, timeout)
+        return await _utils_convert(self, link, alias, silently, timeout)
+
+
+# -------------------------------
+# Wrapper to support sync + async
+# -------------------------------
+def async_to_sync(obj, name):
+    function = getattr(obj, name)
+
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        coroutine = function(*args, **kwargs)
+        try:
+            # Async context → return coroutine
+            asyncio.get_running_loop()
+            return coroutine
+        except RuntimeError:
+            # Sync context → internally run
+            return asyncio.run(coroutine)
+
+    setattr(obj, name, wrapper)
+
+
+# -------------------------------
+# Apply wrapper to Shortly.convert
+# -------------------------------
+Shortly.convert = Shortly._convert_async   # temporary assign
+async_to_sync(Shortly, "convert")         # convert() now supports sync + async
