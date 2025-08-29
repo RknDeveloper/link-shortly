@@ -14,7 +14,7 @@ To Upgrade
 pip install --upgrade link-shortly
 ```
 
-## Quick Usage Example
+## Quick Usage Example ( supports sync )
 ```python
 from shortly import Shortly
 
@@ -26,6 +26,23 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+
+## Quick Usage Example ( supports async  )
+```python
+import asyncio
+from shortly import Shortly
+
+# Initialize Shortly
+shortly = Shortly(api_key='<YOUR API KEY>', base_url='<YOUR BASE SITE>')
+
+async def main():
+    # Async call to convert URL
+    link = await shortly.convert("https://example.com/long-url")
+    print(link)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ## Error Handling
