@@ -10,7 +10,13 @@ Copyright (c) 2025-present RknDeveloper
 
 import asyncio
 import functools
-from .utils import convert as _utils_convert
+from .utils import (
+     adlinkfy_convert,
+     bitly_convert,
+     tinyurl_convert,
+     shareus_convert
+)
+
 from .exceptions import (
     ShortlyValueError
 )
@@ -34,12 +40,18 @@ class Shortly:
         """
         if not base_url or not isinstance(base_url, str):
             raise ShortlyValueError("base_url must be a non-empty string")
-        if not api_key or not isinstance(api_key, str):
-            raise ShortlyValueError("api_key must be a non-empty string")
-            
-        self.api_key = api_key
+        
         self.base_url = (urlparse(base_url).netloc or urlparse(base_url).path).rstrip("/")
 
+        if self.base_url == "tinyurl.com":
+            # api_key optional
+            self.api_key = api_key
+        else:
+            # api_key required
+            if not api_key or not isinstance(api_key, str):
+                raise ShortlyValueError(f"api_key must be a non-empty string for {self.base_url}")
+            self.api_key = api_key
+            
     # Internal async method calling utils.convert
     async def _convert_async(self, link, alias=None, silently=False, timeout=10):
         """
@@ -54,7 +66,16 @@ class Shortly:
         Output:
             Returns shortened link or error response from utils.convert
         """
-        return await _utils_convert(self, link, alias, silently, timeout)
+        if self.base_url == "tinyurl.com":
+            self.shortner = await tinyurl_convert(self, link, alias, silently, timeout)
+        elif self.base_url == "shareus.io":
+            self.shortner = await shareus_convert(self, link, alias, silently, timeout)   
+        elif self.base_url == "bitly.com":
+            self.shortner = await bitly_convert(self, link, alias, silently, timeout)        
+        else:
+            self.shortner = await adlinkfy_convert(self, link, alias, silently, timeout)
+            
+        return self.shortner
 
 
 # -------------------------------
