@@ -1,6 +1,10 @@
 ## Link Shortly
 
-Shortly is a simple Python library to shorten links using the Shortly API or compatible services (like Adlinkfy, GPLinks, etc).
+A simple yet powerful async URL shortener library supporting multiple providers (TinyURL, Bitly, Ouo.io, Adlinkfy, Shareus.io, etc).
+
+[![PyPI](https://img.shields.io/pypi/v/link-shortly.svg)](https://pypi.org/project/link-shortly/)
+[![License](https://img.shields.io/github/license/RknDeveloper/link-shortly)](LICENSE)
+[![Downloads](https://pepy.tech/badge/link-shortly)](https://pepy.tech/project/link-shortly)
 
 ## Installation
 
@@ -106,6 +110,14 @@ try:
 except ShortlyConnectionError:
     print("Failed to connect to the server.")
 ```
+
+## Supported Sites
+adlinkfy all sites support 
+shareus support 
+ouo support 
+bitly support 
+tinyurl support 
+request your shortner sites [Support](https://t.me/RknBots_Support)
 
 ## License
 

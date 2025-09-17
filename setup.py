@@ -14,7 +14,7 @@ setup(
 ],
     author="rkndeveloper",
     author_email="vardhacopyrightteam@gmail.com",
-    description="Link-Shortly is a simple Python library to shorten links using the Link-Shortly API or compatible services (like Adlinkfy, GPLinks, etc).",
+    description="Link-Shortly is a simple Python library to shorten links using the Link-Shortly API or compatible services (like TinyURL, Bitly, Ouo.io, Adlinkfy, Shareus.io, etc).",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/RknDeveloper/link-shortly",

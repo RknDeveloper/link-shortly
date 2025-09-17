@@ -10,12 +10,7 @@ Copyright (c) 2025-present RknDeveloper
 
 import asyncio
 import functools
-from .utils import (
-     adlinkfy_convert,
-     bitly_convert,
-     tinyurl_convert,
-     shareus_convert
-)
+from .utils import LinkShortly
 
 from .exceptions import (
     ShortlyValueError
@@ -66,14 +61,19 @@ class Shortly:
         Output:
             Returns shortened link or error response from utils.convert
         """
+        # LinkShortly instance create 
+        shortly_client = LinkShortly(api_key=self.api_key, base_site=self.base_url)
+        
         if self.base_url == "tinyurl.com":
-            self.shortner = await tinyurl_convert(self, link, alias, silently, timeout)
+            self.shortner = await shortly_client.tinyurl_convert(link, alias, silently, timeout)
         elif self.base_url == "shareus.io":
-            self.shortner = await shareus_convert(self, link, alias, silently, timeout)   
+            self.shortner = await shortly_client.shareus_convert(link, alias, silently, timeout)   
         elif self.base_url == "bitly.com":
-            self.shortner = await bitly_convert(self, link, alias, silently, timeout)        
+            self.shortner = await shortly_client.bitly_convert(link, alias, silently, timeout)
+        elif self.base_url == "ouo.io":  
+            self.shortner = await shortly_client.ouo_convert(link, alias, silently, timeout)
         else:
-            self.shortner = await adlinkfy_convert(self, link, alias, silently, timeout)
+            self.shortner = await shortly_client.adlinkfy_convert(link, alias, silently, timeout)
             
         return self.shortner
 
