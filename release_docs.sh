@@ -2,6 +2,7 @@
 # ==============================================
 # Tools Unified Release Script (Public Repo)
 # Auto-version detect, GitHub release + ZIP, PyPI upload
+# Updated for pyproject.toml support
 # Usage: PYPI_TOKEN=token GITHUB_TOKEN=token ./release_docs.sh <repo_url> <project_dir>
 # ==============================================
 
@@ -20,7 +21,7 @@ fi
 # ---------------- INPUT PARAMETERS ----------------
 REPO_URL=${1:-"https://github.com/RknDeveloper/link-shortly"}
 PROJECT_DIR=${2:-"link-shortly"}
-VERSION_FILE="src/shortly/__init__.py"
+VERSION_FILE="shortly/__init__.py"  # Updated path for new structure
 
 if [ -z "$REPO_URL" ] || [ -z "$PROJECT_DIR" ]; then
     echo "Usage: PYPI_TOKEN=token GITHUB_TOKEN=token ./release_docs.sh <repo_url> <project_dir>"
@@ -59,15 +60,16 @@ echo "✅ Detected version: $VERSION"
 echo "🔹 Cleaning previous builds..."
 rm -rf dist *.egg-info build
 
-# ---------------- BUILD PACKAGE ----------------
-echo "🔹 Building package..."
-python3 setup.py sdist bdist_wheel
+# ---------------- BUILD PACKAGE (pyproject.toml) ----------------
+echo "🔹 Building package with pyproject.toml..."
+python3 -m pip install --upgrade build
+python3 -m build
 
 # ---------------- PREPARE ZIP FOR GITHUB ----------------
 echo "🔹 Preparing ZIP for GitHub release..."
 cd ..
 ZIP_FILE="${PROJECT_DIR}-${VERSION}.zip"
-zip -r "$ZIP_FILE" "$PROJECT_DIR/dist" "$PROJECT_DIR/README.md" 2>/dev/null || true
+zip -r "$ZIP_FILE" "$PROJECT_DIR/dist" "$PROJECT_DIR/README.md" "$PROJECT_DIR/LICENSE" 2>/dev/null || true
 
 # ---------------- CHECK & CREATE GITHUB RELEASE ----------------
 REPO_NAME=$(basename "$REPO_URL" .git)
@@ -95,6 +97,11 @@ else
     fi
 
     # Upload ZIP to GitHub release
+    echo "🔹 Uploading ZIP to GitHub release..."
+    curl -s -H "Authorization: token $GITHUB_TOKEN" \
+         -H "Content-Type: application/zip" \
+         --data-binary @"$ZIP_FILE" \
+         "$UPLOAD_URL?name=$(basename "$ZIP_FILE")"
 
     echo "✅ GitHub release created with ZIP attached!"
 fi
@@ -102,6 +109,7 @@ fi
 # ---------------- UPLOAD TO PYPI ----------------
 echo "🔹 Uploading package to PyPI..."
 cd "$PROJECT_DIR"
+python3 -m pip install --upgrade twine
 python3 -m twine upload dist/* -u __token__ -p "$PYPI_TOKEN"
 
 echo "✅ PyPI upload done!"

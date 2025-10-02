@@ -54,7 +54,7 @@ if __name__ == "__main__":
 The library comes with built-in exception handling to manage common errors such as invalid links, not found links, timeouts, or connection issues.
 ```python
 from shortly import Shortly
-from shortly.exceptions import (
+from shortly.errors import (
     ShortlyInvalidLinkError,
     ShortlyLinkNotFoundError,
     ShortlyTimeoutError,
@@ -86,7 +86,7 @@ except ShortlyError as e:
 If the request takes too long and exceeds the specified timeout, a ShortlyTimeoutError will be raised.
 ```python
 from shortly import Shortly
-from shortly.exceptions import ShortlyTimeoutError
+from shortly.errors import ShortlyTimeoutError
 
 client = Shortly(api_key="your_api_key", base_url="gplinks.com")
 try:
@@ -101,7 +101,7 @@ except ShortlyTimeoutError:
 If there's a problem connecting to the API, a ShortlyConnectionError will be raised.
 ```python
 from shortly import Shortly
-from shortly.exceptions import ShortlyConnectionError
+from shortly.errors import ShortlyConnectionError
 
 client = Shortly(api_key="your_api_key", base_url="gplinks.com")
 try:

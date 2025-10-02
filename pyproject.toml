@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "link-shortly"
+dynamic = ["version"]
+description = "Link-Shortly is a simple Python library to shorten links using the Link-Shortly API or compatible services"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "rkndeveloper", email = "vardhacopyrightteam@gmail.com"}
+]
+keywords = [
+    "link-shortener", 
+    "url-shortener", 
+    "api-wrapper", 
+    "tinyurl", 
+    "bitly",
+    "ouo.io",
+    "adlinkfy", 
+    "shareus.io",
+    "link-shortly"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+    "aiohttp>=3.12.15",
+]
+
+[project.urls]
+Homepage = "https://github.com/RknDeveloper/link-shortly"
+Documentation = "https://github.com/RknDeveloper/link-shortly#readme"
+Source = "https://github.com/RknDeveloper/link-shortly"
+Tracker = "https://github.com/RknDeveloper/link-shortly/issues"
+Changelog = "https://github.com/RknDeveloper/link-shortly/releases"
+
+[tool.setuptools]
+packages = ["shortly"]# Current directory mein dhundhega
+
+[tool.setuptools.dynamic]
+version = {attr = "shortly.__version__"}
