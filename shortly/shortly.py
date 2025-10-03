@@ -12,7 +12,7 @@ import asyncio
 import functools
 from .utils import LinkShortly
 
-from .exceptions import (
+from .errors import (
     ShortlyValueError
 )
 from urllib.parse import urlparse

@@ -11,7 +11,7 @@ Copyright (c) 2025-present RknDeveloper
 import aiohttp
 import asyncio
 import json
-from .exceptions import (
+from .errors import (
     ShortlyError,
     ShortlyInvalidLinkError,
     ShortlyLinkNotFoundError,
@@ -25,7 +25,7 @@ class LinkShortly:
         self.api_key = api_key
         self.base_site = base_site
 
-    async def adlinkfy_convert(self, link, alias=None, silently=False, timeout=10):  
+    async def adlinkfy_convert(self, link, alias=None, silently=False, timeout=30):  
         """  
         Shorten a URL using Link Shortly/All Adlinkfy API.  
 
@@ -35,7 +35,7 @@ class LinkShortly:
             link (str): The long URL you want to shorten.  
             alias (str, optional): Custom alias for the short link. Default is None.  
             silently (bool): If True, the function will directly return the original URL without raising errors.  
-            timeout (int, optional): Maximum seconds to wait for API response. Default is 10.  
+            timeout (int, optional): Maximum seconds to wait for API response. Default is 30.  
 
         Returns:  
             str: The shortened URL returned by the API.  
@@ -48,11 +48,12 @@ class LinkShortly:
             ShortlyJsonDecodeError: If API response is not valid JSON.  
             ShortlyError: For other API-related errors.  
         """  
+        if silently:  
+            return link
+            
         api_url = f"https://{self.base_site}/api"  
         params = {"api": self.api_key, "url": link}  
-
-        if silently:  
-            return link  
+     
         if alias:  
             params["alias"] = alias  
 
@@ -93,7 +94,7 @@ class LinkShortly:
         except Exception as e:  
             raise ShortlyError(f"An unexpected error occurred: {e}")
 
-    async def ouo_convert(self, link, alias=None, silently=False, timeout=10):
+    async def ouo_convert(self, link, alias=None, silently=False, timeout=30):
         """
         Shorten a URL using ouo.io API.
 
@@ -107,7 +108,7 @@ class LinkShortly:
             return link  
 
         # API endpoint  
-        api_url = f"http://{self.base_site}/api/{self.api_key}"  
+        api_url = f"https://{self.base_site}/api/{self.api_key}"  
         params = {"s": link}  
 
         try:  
@@ -127,7 +128,7 @@ class LinkShortly:
         except Exception as e:  
             raise ShortlyError(f"Ouo.io unexpected error: {e}")
 
-    async def shareus_convert(self, link, alias=None, silently=False, timeout=10):
+    async def shareus_convert(self, link, alias=None, silently=False, timeout=30):
         """
         Shorten a URL using Shareus.io API.
 
@@ -137,7 +138,7 @@ class LinkShortly:
             link (str): The long URL you want to shorten.  
             alias (str, optional): Custom alias for the short link. Default is None.  
             silently (bool): If True, the function will directly return the original URL without raising errors.  
-            timeout (int, optional): Maximum seconds to wait for API response. Default is 10.  
+            timeout (int, optional): Maximum seconds to wait for API response. Default is 30.  
 
         Returns:  
             str: The shortened URL returned by the API.  
@@ -201,7 +202,7 @@ class LinkShortly:
         except Exception as e:  
             raise ShortlyError(f"An unexpected error occurred: {e}")
 
-    async def tinyurl_convert(self, link, alias=None, silently=False, timeout=10):
+    async def tinyurl_convert(self, link, alias=None, silently=False, timeout=30):
         """
         Shorten a URL using TinyURL API - supports both old (no token) and new (with token) APIs
         """
@@ -214,12 +215,12 @@ class LinkShortly:
         else:  
             return await self._tinyurl_old_api(link, alias, timeout)
 
-    async def _tinyurl_old_api(self, link, alias=None, timeout=10):
+    async def _tinyurl_old_api(self, link, alias=None, timeout=30):
         """
         Old TinyURL API (no token required)
-        Docs: http://tinyurl.com/api-create.php
+        Docs: https://tinyurl.com/api-create.php
         """
-        api_url = f"http://{self.base_site}/api-create.php"
+        api_url = f"https://{self.base_site}/api-create.php"
         params = {"url": link}
 
         if alias:  
@@ -245,7 +246,7 @@ class LinkShortly:
         except Exception as e:  
             raise ShortlyError(f"TinyURL unexpected error: {e}")
 
-    async def _tinyurl_new_api(self, link, alias=None, timeout=10):
+    async def _tinyurl_new_api(self, link, alias=None, timeout=30):
         """
         New TinyURL API (requires token)
         Docs: https://tinyurl.com/app/dev/api
@@ -322,7 +323,7 @@ class LinkShortly:
         except Exception as e:    
             raise ShortlyError(f"TinyURL unexpected error: {e}")
 
-    async def bitly_convert(self, link, alias=None, silently=False, timeout=10):
+    async def bitly_convert(self, link, alias=None, silently=False, timeout=30):
         """
         Bitly API का उपयोग करके URL को छोटा (shorten) करें।
         Docs: https://dev.bitly.com/api-reference
