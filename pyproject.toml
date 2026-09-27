@@ -1,44 +1,39 @@
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = ["setuptools>=75.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "link-shortly"
 dynamic = ["version"]
-description = "Link-Shortly is a simple Python library to shorten links using the Link-Shortly API or compatible services"
+description = "An async and sync Python client for URL-shortening services"
 readme = "README.md"
-requires-python = ">=3.6"
-license = {text = "MIT"}
+requires-python = ">=3.9"
+license = "MIT"
 authors = [
     {name = "rkndeveloper", email = "vardhacopyrightteam@gmail.com"}
 ]
-keywords = [
-    "link-shortener", 
-    "url-shortener", 
-    "api-wrapper", 
-    "tinyurl", 
-    "bitly",
-    "ouo.io",
-    "adlinkfy", 
-    "shareus.io",
-    "link-shortly"
-]
+keywords = ["link-shortener", "url-shortener", "api-wrapper", "tinyurl", "bitly"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "aiohttp>=3.12.15",
+    "aiohttp>=3.14.3,<4.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "build>=1.2",
+    "pytest>=8.0",
 ]
 
 [project.urls]
@@ -49,7 +44,11 @@ Tracker = "https://github.com/RknDeveloper/link-shortly/issues"
 Changelog = "https://github.com/RknDeveloper/link-shortly/releases"
 
 [tool.setuptools]
-packages = ["shortly"]# Current directory mein dhundhega
+packages = ["shortly"]
 
 [tool.setuptools.dynamic]
 version = {attr = "shortly.__version__"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

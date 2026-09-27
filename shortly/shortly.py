@@ -1,105 +1,84 @@
-"""
-Link-Shortly - A simple URL shortening library.
+"""Public client for the Link-Shortly providers."""
 
-@author:   RknDeveloper
-@contact:  https://t.me/RknDeveloperr
-@license:  MIT License, see LICENSE file
-
-Copyright (c) 2025-present RknDeveloper
-"""
+from __future__ import annotations
 
 import asyncio
 import functools
+from urllib.parse import urlparse
+from typing import Any, Optional
+
+from .errors import ShortlyValueError
 from .utils import LinkShortly
 
-from .errors import (
-    ShortlyValueError
-)
-from urllib.parse import urlparse
 
 class Shortly:
-    def __init__(self, api_key=None, base_url=None):
-        """
-        Initialize Shortly instance.
-        
-        Input:
-            api_key (str)  -> API key for authentication
-            base_url (str) -> Base API URL of the shortening service
-        
-        Output:
-            Stores api_key and base_url in the object
-            
-        Raises:
-            ShortlyValueError: api_key & base_url must be a non-empty string
-        
-        """
-        if not base_url or not isinstance(base_url, str):
+    """Shorten URLs through one of the supported provider APIs.
+
+    ``convert`` can be called synchronously from normal Python code or awaited
+    from an already-running asyncio event loop.
+    """
+
+    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
+        if not isinstance(base_url, str) or not base_url.strip():
             raise ShortlyValueError("base_url must be a non-empty string")
-        
-        self.base_url = (urlparse(base_url).netloc or urlparse(base_url).path).rstrip("/")
+
+        raw_url = base_url.strip()
+        parsed = urlparse(raw_url if "://" in raw_url else f"//{raw_url}")
+        self.base_url = (parsed.netloc or parsed.path).rstrip("/").lower()
+        if not self.base_url:
+            raise ShortlyValueError("base_url must be a non-empty string")
 
         if self.base_url == "tinyurl.com":
-            # api_key optional
-            self.api_key = api_key
+            # The legacy TinyURL endpoint does not require a token.
+            self.api_key = api_key.strip() if isinstance(api_key, str) else api_key
         else:
-            # api_key required
-            if not api_key or not isinstance(api_key, str):
-                raise ShortlyValueError(f"api_key must be a non-empty string for {self.base_url}")
-            self.api_key = api_key
-            
-    # Internal async method calling utils.convert
-    async def _convert_async(self, link, alias=None, silently=False, timeout=10):
-        """
-        Convert a long link into a short one using alias.
+            if not isinstance(api_key, str) or not api_key.strip():
+                raise ShortlyValueError(
+                    f"api_key must be a non-empty string for {self.base_url}"
+                )
+            self.api_key = api_key.strip()
 
-        Input:
-            link (str)    -> The long URL to shorten
-            alias (str)   -> Custom alias for the shortened URL
-            silently (bool) -> If True, the function will directly return the original URL without raising errors.
-            timeout (int) -> Request timeout in seconds (default: 10)
+    async def _convert_async(
+        self,
+        link: str,
+        alias: Optional[str] = None,
+        silently: bool = False,
+        timeout: float = 10,
+    ) -> str:
+        """Convert a long URL into a short URL."""
+        if not isinstance(link, str) or not link.strip():
+            raise ShortlyValueError("link must be a non-empty string")
+        if not isinstance(timeout, (int, float)) or timeout <= 0:
+            raise ShortlyValueError("timeout must be a positive number")
+        if alias is not None and (not isinstance(alias, str) or not alias.strip()):
+            raise ShortlyValueError("alias must be a non-empty string when provided")
 
-        Output:
-            Returns shortened link or error response from utils.convert
-        """
-        # LinkShortly instance create 
-        shortly_client = LinkShortly(api_key=self.api_key, base_site=self.base_url)
-        
-        if self.base_url == "tinyurl.com":
-            self.shortner = await shortly_client.tinyurl_convert(link, alias, silently, timeout)
-        elif self.base_url == "shareus.io":
-            self.shortner = await shortly_client.shareus_convert(link, alias, silently, timeout)   
-        elif self.base_url == "bitly.com":
-            self.shortner = await shortly_client.bitly_convert(link, alias, silently, timeout)
-        elif self.base_url == "ouo.io":  
-            self.shortner = await shortly_client.ouo_convert(link, alias, silently, timeout)
-        else:
-            self.shortner = await shortly_client.adlinkfy_convert(link, alias, silently, timeout)
-            
-        return self.shortner
+        client = LinkShortly(api_key=self.api_key, base_site=self.base_url)
+        providers = {
+            "tinyurl.com": client.tinyurl_convert,
+            "shareus.io": client.shareus_convert,
+            "bitly.com": client.bitly_convert,
+            "ouo.io": client.ouo_convert,
+        }
+        converter = providers.get(self.base_url, client.adlinkfy_convert)
+        return await converter(link.strip(), alias, silently, timeout)
 
 
-# -------------------------------
-# Wrapper to support sync + async
-# -------------------------------
-def async_to_sync(obj, name):
+def async_to_sync(obj: Any, name: str) -> None:
+    """Wrap an async method so it works in sync and async callers."""
     function = getattr(obj, name)
 
     @functools.wraps(function)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         coroutine = function(*args, **kwargs)
         try:
-            # Async context → return coroutine
             asyncio.get_running_loop()
-            return coroutine
         except RuntimeError:
-            # Sync context → internally run
             return asyncio.run(coroutine)
+        return coroutine
 
     setattr(obj, name, wrapper)
 
 
-# -------------------------------
-# Apply wrapper to Shortly.convert
-# -------------------------------
-Shortly.convert = Shortly._convert_async   # temporary assign
-async_to_sync(Shortly, "convert")         # convert() now supports sync + async
+Shortly.convert = Shortly._convert_async
+async_to_sync(Shortly, "convert")

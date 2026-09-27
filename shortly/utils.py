@@ -71,6 +71,8 @@ class LinkShortly:
                         raise ShortlyError("Failed to shorten your link (bad response).")  
                     try:  
                         data = await response.json()  
+                    except ShortlyError:
+                        raise
                     except Exception as e:  
                         raise ShortlyJsonDecodeError(f"Invalid JSON response: {e}")  
 
@@ -91,6 +93,8 @@ class LinkShortly:
             raise ShortlyTimeoutError(f"Request timed out after {timeout} seconds.")  
         except aiohttp.ClientConnectionError:  
             raise ShortlyConnectionError(f"Failed to connect to {self.base_site}.")  
+        except ShortlyError:
+            raise
         except Exception as e:  
             raise ShortlyError(f"An unexpected error occurred: {e}")
 
@@ -125,6 +129,8 @@ class LinkShortly:
             raise ShortlyTimeoutError(f"Ouo.io request timed out after {timeout} seconds.")  
         except aiohttp.ClientConnectionError:  
             raise ShortlyConnectionError("Failed to connect to ouo.io.")  
+        except ShortlyError:
+            raise
         except Exception as e:  
             raise ShortlyError(f"Ouo.io unexpected error: {e}")
 
@@ -199,6 +205,8 @@ class LinkShortly:
         except json.JSONDecodeError as e:  
             # This is expected for Shareus as it returns plain text, not JSON  
             raise ShortlyJsonDecodeError(f"Json Error: {e}")  
+        except ShortlyError:
+            raise
         except Exception as e:  
             raise ShortlyError(f"An unexpected error occurred: {e}")
 
@@ -243,6 +251,8 @@ class LinkShortly:
             raise ShortlyTimeoutError(f"TinyURL request timed out after {timeout} seconds.")  
         except aiohttp.ClientConnectionError:  
             raise ShortlyConnectionError("Failed to connect to TinyURL.")  
+        except ShortlyError:
+            raise
         except Exception as e:  
             raise ShortlyError(f"TinyURL unexpected error: {e}")
 
@@ -320,6 +330,8 @@ class LinkShortly:
             raise ShortlyTimeoutError(f"TinyURL request timed out after {timeout} seconds.")  
         except aiohttp.ClientConnectionError:    
             raise ShortlyConnectionError("Failed to connect to TinyURL API.")  
+        except ShortlyError:
+            raise
         except Exception as e:    
             raise ShortlyError(f"TinyURL unexpected error: {e}")
 
@@ -363,6 +375,8 @@ class LinkShortly:
                     
                     try:  
                         data = await response.json()  
+                    except ShortlyError:
+                        raise
                     except Exception as e:  
                         raise ShortlyJsonDecodeError(f"Invalid JSON from Bitly: {e}")  
                         
@@ -372,5 +386,7 @@ class LinkShortly:
             raise ShortlyTimeoutError(f"Bitly request timed out after {timeout} seconds.")  
         except aiohttp.ClientConnectionError:  
             raise ShortlyConnectionError("Failed to connect to Bitly.")  
+        except ShortlyError:
+            raise
         except Exception as e:  
             raise ShortlyError(f"Bitly unexpected error: {e}")

@@ -1,18 +1,28 @@
-"""
-Shortly - A simple URL shortening library.
+"""Link-Shortly public package API."""
 
-@author:   RknDeveloper
-@contact:  https://t.me/RknDeveloperr
-@license:  MIT License, see LICENSE file
-
-Copyright (c) 2025-present RknDeveloper
-"""
-
-
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __author__ = "RknDeveloper"
-__license__ = "MIT License "
-__copyright__ = "Copyright (C) 2025-present RknDeveloper <https://github.com/RknDeveloper>"
+__license__ = "MIT"
+__copyright__ = "Copyright (C) 2025-present RknDeveloper"
 
 from .shortly import Shortly
-from .errors import ShortlyError
+from .errors import (
+    ShortlyConnectionError,
+    ShortlyError,
+    ShortlyInvalidLinkError,
+    ShortlyJsonDecodeError,
+    ShortlyLinkNotFoundError,
+    ShortlyTimeoutError,
+    ShortlyValueError,
+)
+
+__all__ = [
+    "Shortly",
+    "ShortlyError",
+    "ShortlyInvalidLinkError",
+    "ShortlyLinkNotFoundError",
+    "ShortlyTimeoutError",
+    "ShortlyConnectionError",
+    "ShortlyJsonDecodeError",
+    "ShortlyValueError",
+]

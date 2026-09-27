@@ -13,6 +13,8 @@ Install link-shortly with pip
 pip install link-shortly
 ```
 
+Current release: **0.0.8**. Python **3.9+** is required.
+
 To Upgrade
 ```python
 pip install --upgrade link-shortly
