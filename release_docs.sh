@@ -109,8 +109,18 @@ fi
 # ---------------- UPLOAD TO PYPI ----------------
 echo "🔹 Uploading package to PyPI..."
 cd "$PROJECT_DIR"
-python3 -m pip install --upgrade twine
-python3 -m twine upload dist/* -u __token__ -p "$PYPI_TOKEN"
+
+# Do not reinstall/upgrade Twine on Termux; that pulls the Rust-only nh3 dependency.
+if ! python3 -m twine --version >/dev/null 2>&1; then
+    echo "❌ Twine is not installed or is not usable. Run once:"
+    echo "pip install --no-deps twine==7.0.0"
+    echo "pip install requests requests-toolbelt urllib3 keyring rfc3986 rich packaging pkginfo id"
+    exit 1
+fi
+
+# Upload only; --skip-existing makes reruns safe after a partial upload.
+TWINE_USERNAME="__token__" TWINE_PASSWORD="$PYPI_TOKEN" \
+    python3 -m twine upload --skip-existing dist/*
 
 echo "✅ PyPI upload done!"
 echo "🎉 Release process complete!"
